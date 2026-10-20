@@ -31,6 +31,11 @@ body {
   padding: clamp(8px, 1.2vw, 18px);
   display: flex;
   flex-direction: column;
+  
+  background-image: url("back.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 header {
@@ -76,10 +81,6 @@ main {
   grid-template-rows: repeat(var(--rows, 1), minmax(0, 1fr));
   gap: clamp(5px, .7vw, 10px);
 
-  background-image: url("back.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 
 .student {
