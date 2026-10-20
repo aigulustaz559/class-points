@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101828">
+<title>Class Points</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f5fa;color:#182230;font-family:Arial,system-ui,sans-serif}
+header{background:#101828;color:white;padding:22px max(20px,calc((100% - 960px)/2))}
+.brand{font-size:24px;font-weight:800}.brand span{color:#84adff}
+.sub{font-size:13px;color:#b9c5d8;margin-top:5px}
+main{max-width:960px;margin:40px auto;padding:0 18px}
+.layout{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:start}
+.card{background:white;border:1px solid #e2e8f0;border-radius:18px;padding:26px;box-shadow:0 8px 30px #18223008}
+h1{font-size:27px;margin:16px 0 10px}h2{font-size:18px;margin-top:0}
+p{color:#667085;line-height:1.6;font-size:14px}
+label{display:block;font-size:13px;font-weight:700;margin:20px 0 8px}
+input,select{width:100%;min-height:48px;padding:12px;border:1px solid #d0d5dd;border-radius:10px;background:white;font:inherit}
+input:focus,select:focus{outline:3px solid #dbeafe;border-color:#528bff}
+button{border:0;border-radius:10px;padding:14px;font:inherit;font-weight:700;cursor:pointer}
+.primary{width:100%;margin-top:22px;background:#245fe8;color:white}
+.primary:disabled{opacity:.6;cursor:wait}
+.tag{display:inline-block;padding:6px 10px;border-radius:20px;background:#eff6ff;color:#2453a6;font-size:11px;font-weight:800}
+.notice{padding:14px;border-radius:11px;background:#eff6ff;color:#2453a6;font-size:13px;line-height:1.6}
+.status{margin-top:15px;font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+.error{color:#b42318}.success{color:#067647}
+.big{font-size:46px;font-weight:800;letter-spacing:-2px;margin:14px 0}
+.big span{color:#245fe8}
+footer{text-align:center;padding:24px;color:#98a2b3;font-size:12px}
+@media(max-width:680px){main{margin:24px auto}.layout{grid-template-columns:1fr}.card{padding:21px}h1{font-size:24px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Class <span>Points</span></div>
+  <div class="sub">Система баллов класса</div>
+</header>
+
+<main>
+<div class="layout">
+<section class="card">
+  <span class="tag">УЧЕНИЧЕСКИЙ ПОРТАЛ</span>
+  <h1>Отправить баллы</h1>
+  <p>Выбери своё имя, введи пароль класса и укажи новый баланс.</p>
+
+  <form id="form">
+    <label for="student">Твоё ФИО</label>
+    <select id="student" required>
+      <option value="">Загрузка списка учеников...</option>
+    </select>
+
+    <label for="password">Пароль класса</label>
+    <input id="password" type="password" autocomplete="current-password"
+      placeholder="Пароль класса" required>
+
+    <label for="points">Новый баланс (0–10)</label>
+    <input id="points" type="number" min="0" max="10" step="1"
+      inputmode="numeric" placeholder="Например, 7" required>
+
+    <button class="primary" id="submit" type="submit" disabled>
+      Отправить баллы
+    </button>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+  </form>
+</section>
+
+<aside class="card">
+  <h2>Как это работает?</h2>
+  <div class="notice">
+    <strong>Один запрос</strong><br>
+    После принятия запроса повторная отправка блокируется правилами сервера.
+  </div>
+  <div class="big">0<span>–10</span></div>
+  <p>Введённое число станет твоим новым балансом, а не прибавится к прежнему.</p>
+  <hr style="border:0;border-top:1px solid #eaecf0;margin:22px 0">
+  <p>Баллы всего класса отображаются в презентации PowerPoint. Передача баллов между учениками не предусмотрена.</p>
+</aside>
+</div>
+</main>
+<footer>Class Points · Учебный проект</footer>
+
+<script>
+const SUPABASE_URL = "https://izbxumimzerxasevkkg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_pVuFu_Hkeq07SDirDNJoGw_UcjhYCNj";
+const FUNCTION_URL = SUPABASE_URL + "/functions/v1/class-points";
+
+const studentSelect = document.getElementById("student");
+const passwordInput = document.getElementById("password");
+const pointsInput = document.getElementById("points");
+const submitButton = document.getElementById("submit");
+const statusBox = document.getElementById("status");
+const form = document.getElementById("form");
+
+function showStatus(message, type = "") {
+  statusBox.className = "status " + type;
+  statusBox.textContent = message;
+}
+
+async function callFunction(payload) {
+  const response = await fetch(FUNCTION_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_KEY,
+      "Authorization": "Bearer " + SUPABASE_KEY
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(result.error || "Сервер отклонил запрос (HTTP " + response.status + ").");
+  }
+
+  return result;
+}
+
+async function loadStudents() {
+  submitButton.disabled = true;
+  studentSelect.disabled = true;
+  showStatus("Подключаемся к базе данных...");
+
+  try {
+    const result = await callFunction({ action: "students" });
+
+    if (!Array.isArray(result.students)) {
+      throw new Error("Сервер вернул неожиданный формат списка.");
+    }
+
+    studentSelect.replaceChildren(new Option("Выбери своё ФИО", ""));
+
+    for (const student of result.students) {
+      if (!student.id || !student.full_name) continue;
+      studentSelect.add(new Option(student.full_name, student.id));
+    }
+
+    if (studentSelect.options.length <= 1) {
+      showStatus("Список учеников пуст. Проверь данные в Supabase.", "error");
+      return;
+    }
+
+    studentSelect.disabled = false;
+    submitButton.disabled = false;
+    showStatus("Список учеников загружен.", "success");
+  } catch (error) {
+    showStatus(
+      "Не удалось загрузить учеников. Проверь публикацию Edge Function и её настройки CORS. " +
+      (error.message || ""),
+      "error"
+    );
+  }
+}
+
+form.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const studentId = studentSelect.value;
+  const password = passwordInput.value;
+  const points = Number(pointsInput.value);
+
+  if (!studentId) {
+    showStatus("Выбери своё ФИО.", "error");
+    return;
+  }
+
+  if (!password) {
+    showStatus("Введи пароль класса.", "error");
+    return;
+  }
+
+  if (!Number.isInteger(points) || points < 0 || points > 10) {
+    showStatus("Баллы должны быть целым числом от 0 до 10.", "error");
+    return;
+  }
+
+  const confirmed = confirm(
+    "Установить новый баланс: " + points + " баллов?\n" +
+    "После принятия запроса повторная отправка может быть заблокирована."
+  );
+
+  if (!confirmed) return;
+
+  submitButton.disabled = true;
+  studentSelect.disabled = true;
+  showStatus("Отправляем запрос на сервер...");
+
+  try {
+    const result = await callFunction({
+      action: "submit",
+      student_id: studentId,
+      password,
+      points
+    });
+
+    if (result.success !== true) {
+      throw new Error("Сервер не подтвердил принятие запроса.");
+    }
+
+    form.reset();
+    showStatus(
+      "Сервер подтвердил запрос. Новый баланс: " + points +
+      ". Сохрани результат, если он понадобится.",
+      "success"
+    );
+  } catch (error) {
+    showStatus(
+      "Запрос не подтверждён: " + (error.message || "ошибка сервера"),
+      "error"
+    );
+  } finally {
+    passwordInput.value = "";
+    studentSelect.disabled = false;
+    submitButton.disabled = false;
+  }
+});
+
+loadStudents();
+</script>
+</body>
+</html>
