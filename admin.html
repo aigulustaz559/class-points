@@ -31,8 +31,7 @@ table{width:100%;border-collapse:collapse;min-width:720px}th,td{text-align:left;
 <header><div><div class="brand">Class <span>Points</span> / Admin</div><div class="sub">Управление системой баллов класса</div></div><button id="logout" class="secondary hidden">Выйти</button></header>
 <section id="loginView" class="login">
   <h1 style="margin-top:0">Вход администратора</h1><p class="muted">Используй учётную запись Supabase Auth, которой выдана роль admin.</p>
-  <form id="loginForm"><label for="email">Email</label><input id="email" type="email" autocomplete="username" required>
-  <label for="password">Пароль</label><input id="password" type="password" autocomplete="current-password" required>
+  <form id="loginForm"><label for="password">Секретный пароль администратора</label><input id="password" type="password" autocomplete="current-password" required>
   <button class="primary" style="width:100%;margin-top:18px">Войти</button><div id="loginMsg" class="msg" role="status"></div></form>
 </section>
 <main id="app" class="wrap hidden">
@@ -101,7 +100,7 @@ async function loadAudit(){const d=await api("audit");auditCache=d.events||[];re
 function renderAudit(){const q=$("auditSearch").value.toLowerCase(),day=$("auditDate").value;const rows=auditCache.filter(a=>(!day||String(a.created_at).slice(0,10)===day)&&(String(a.actor||"")+" "+String(a.action||"")).toLowerCase().includes(q)).map(a=>`<tr><td>${date(a.created_at)}</td><td>${esc(a.actor)}</td><td>${esc(a.action)}</td><td>${esc(a.student_name||a.student_id||"—")}</td><td><code>${esc(JSON.stringify(a.details||{}))}</code></td></tr>`);$("auditTable").innerHTML=table(["Дата","Актор","Действие","Ученик","Детали"],rows);}
 async function refreshAll(){try{await loadDashboard();await loadStudents();await loadSubmissions();await loadBlocks();await loadAudit();msg("globalMsg","Данные обновлены.","success");}catch(e){msg("globalMsg",e.message,"error");}}
 async function start(token){accessToken=token;$("loginView").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");await refreshAll();}
-$("loginForm").addEventListener("submit",async e=>{e.preventDefault();msg("loginMsg","Выполняется вход…");try{const r=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY},body:JSON.stringify({email:$("email").value,password:$("password").value})});const d=await r.json();if(!r.ok)throw new Error(d.msg||d.message||"Неверный email или пароль");await start(d.access_token);}catch(e){msg("loginMsg",e.message,"error");}});
+$("loginForm").addEventListener("submit",async e=>{e.preventDefault();msg("loginMsg","Проверяем секретный пароль…");try{const r=await fetch(FN,{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY},body:JSON.stringify({action:"login",password:$("password").value})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"Вход не выполнен");$("password").value="";await start(d.token);}catch(e){msg("loginMsg",e.message,"error");}});
 $("logout").onclick=()=>{accessToken=null;$("app").classList.add("hidden");$("logout").classList.add("hidden");$("loginView").classList.remove("hidden");$("password").value="";msg("loginMsg","Вы вышли из системы.");};
 $("nav").addEventListener("click",e=>{const b=e.target.closest("button[data-page]");if(b)setPage(b.dataset.page);});
 $("refreshDash").onclick=()=>loadDashboard().catch(e=>msg("globalMsg",e.message,"error"));
