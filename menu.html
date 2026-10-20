@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#081426">
 <title>Class Points — Табло класса</title>
 
 <style>
@@ -12,143 +13,157 @@
 :root {
   --bg: #081426;
   --panel: #11233d;
-  --blue: #3b82f6;
   --yellow: #ffd84d;
-  --green: #43e08c;
   --white: #ffffff;
 }
 
 html, body {
+  width: 100%;
+  height: 100%;
   margin: 0;
-  min-height: 100%;
+  overflow: hidden;
   background: var(--bg);
   color: var(--white);
   font-family: Arial, Helvetica, sans-serif;
 }
 
-body { padding: 24px; }
+body {
+  padding: clamp(8px, 1.2vw, 18px);
+  display: flex;
+  flex-direction: column;
+}
 
 header {
-  max-width: 1500px;
-  margin: 0 auto 26px;
+  width: 100%;
+  flex: 0 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
+  gap: 12px;
+  padding-bottom: clamp(8px, 1vh, 14px);
 }
 
 .brand {
-  font-size: clamp(28px, 3vw, 48px);
+  font-size: clamp(22px, 2.5vw, 40px);
   font-weight: 900;
-  letter-spacing: -1px;
+  white-space: nowrap;
 }
 
 .brand span { color: var(--yellow); }
 
 .info {
   text-align: right;
-  color: #b8c9e4;
-  font-size: 14px;
+  color: #bdcbe0;
+  font-size: clamp(10px, .9vw, 14px);
 }
 
 #connection {
-  color: var(--green);
-  margin-top: 6px;
+  margin-top: 4px;
+  color: #43e08c;
 }
 
 main {
-  max-width: 1500px;
-  margin: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
 }
 
 .board {
+  width: 100%;
+  height: 100%;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-rows: repeat(var(--rows, 1), minmax(0, 1fr));
+  gap: clamp(5px, .7vw, 10px);
 }
 
 .student {
   min-width: 0;
+  min-height: 0;
   display: grid;
-  grid-template-columns: 1fr 90px;
-  align-items: stretch;
-  gap: 10px;
-  padding: 12px;
-  border: 1px solid #2c4568;
-  border-radius: 17px;
+  grid-template-columns: minmax(0, 1fr) clamp(42px, 5.2vw, 76px);
+  gap: clamp(4px, .5vw, 8px);
+  padding: clamp(4px, .6vw, 9px);
   background: var(--panel);
-  box-shadow: 0 8px 22px #00000020;
+  border: 1px solid #2b4263;
+  border-radius: clamp(7px, .8vw, 13px);
 }
 
 .student-name {
   min-width: 0;
+  min-height: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: #ffffff;
+  gap: clamp(4px, .5vw, 8px);
+  padding: clamp(5px, .65vw, 10px);
+  border-radius: 7px;
+  background: #fff;
   color: #17243a;
-  border-radius: 11px;
-  padding: 12px;
-  font-size: clamp(15px, 1.35vw, 22px);
+  font-size: clamp(11px, 1.15vw, 19px);
   font-weight: 800;
+  line-height: 1.12;
   overflow-wrap: anywhere;
+  overflow: hidden;
 }
 
-.number {
-  color: #6b7c94;
-  font-size: 13px;
-  flex-shrink: 0;
+.bulb {
+  width: clamp(17px, 2vw, 29px);
+  height: clamp(17px, 2vw, 29px);
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.student-number {
+  color: #77869b;
+  font-size: clamp(9px, .7vw, 12px);
+  flex: 0 0 auto;
 }
 
 .score {
   display: flex;
-  align-items: center;
   justify-content: center;
-  min-height: 68px;
-  border-radius: 11px;
+  align-items: center;
+  min-width: 0;
+  min-height: 0;
+  border-radius: 7px;
   background: var(--yellow);
   color: #17243a;
-  font-size: clamp(25px, 2.2vw, 36px);
+  font-size: clamp(19px, 2.2vw, 34px);
   font-weight: 900;
-}
-
-.bulb {
-  width: 30px;
-  height: 30px;
-  object-fit: contain;
-  flex-shrink: 0;
 }
 
 .empty {
   grid-column: 1 / -1;
-  padding: 50px 20px;
-  border-radius: 16px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--panel);
-  color: #c4d3e9;
-  font-size: 20px;
+  border-radius: 12px;
+  color: #d1dced;
+  text-align: center;
+  padding: 20px;
 }
 
 footer {
-  max-width: 1500px;
-  margin: 24px auto 0;
+  flex: 0 0 auto;
   display: flex;
   justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  color: #9bb0cd;
-  font-size: 13px;
+  gap: 8px;
+  padding-top: clamp(6px, .8vh, 12px);
+  color: #9eb0cb;
+  font-size: clamp(9px, .75vw, 12px);
 }
 
-@media (max-width: 950px) {
-  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 700px) {
+  .board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-@media (max-width: 580px) {
-  body { padding: 12px; }
-  header { align-items: flex-start; }
+@media (max-width: 420px) {
+  body { padding: 7px; }
   .board { grid-template-columns: 1fr; }
-  .student { grid-template-columns: 1fr 75px; }
+  .student { grid-template-columns: minmax(0, 1fr) 48px; }
 }
 </style>
 </head>
@@ -158,48 +173,45 @@ footer {
   <div class="brand">CLASS <span>POINTS</span></div>
   <div class="info">
     <div>ТАБЛО БАЛЛОВ КЛАССА</div>
-    <div id="connection">Подключение к Supabase…</div>
+    <div id="connection">Подключение…</div>
   </div>
 </header>
 
 <main>
   <div id="board" class="board">
-    <div class="empty">Загружаем список учеников…</div>
+    <div class="empty">Загружаем учеников…</div>
   </div>
 </main>
 
 <footer>
-  <span>Баллы класса в реальном времени</span>
-  <span>Автообновление каждые 2 секунды</span>
+  <span>Баллы класса</span>
+  <span>Обновление каждые 2 секунды</span>
 </footer>
 
 <script>
 "use strict";
 
-// Настройки Supabase — из рабочего ученического портала.
 const SUPABASE_URL =
   "https://izbxumimzerxasevkkgy.supabase.co";
 
-// Вставь сюда Publishable key из Supabase → Settings → API Keys.
 const SUPABASE_KEY =
   "sb_publishable_pVuFu_Hkeq07SDirDNJoGw_UcjhYCNj";
 
 const FUNCTION_URL =
-  `${SUPABASE_URL}/functions/v1/class-points`;
+  SUPABASE_URL + "/functions/v1/class-points";
 
-// Настоящее изображение лампочки, не emoji.
 const BULB_IMAGE =
   "https://upload.wikimedia.org/wikipedia/commons/0/06/Light_bulb.png";
 
 const board = document.getElementById("board");
 const connection = document.getElementById("connection");
 
-let isLoading = false;
-let lastData = "";
+let loading = false;
+let previousSnapshot = "";
 
-function setConnection(message, isError = false) {
+function setStatus(message, error = false) {
   connection.textContent = message;
-  connection.style.color = isError ? "#ff8c8c" : "#43e08c";
+  connection.style.color = error ? "#ff8b8b" : "#43e08c";
 }
 
 async function fetchStudents() {
@@ -212,63 +224,58 @@ async function fetchStudents() {
     body: JSON.stringify({ action: "students" })
   });
 
-  const result = await response.json().catch(() => ({}));
+  const text = await response.text();
+  let result;
+
+  try {
+    result = JSON.parse(text);
+  } catch {
+    throw new Error("Сервер вернул не JSON: " + text.slice(0, 200));
+  }
 
   if (!response.ok) {
     throw new Error(
-      result.message ||
-      result.error ||
-      `HTTP ${response.status}`
+      result.message || result.error || "HTTP " + response.status
     );
   }
 
   if (!Array.isArray(result.students)) {
-    throw new Error("В ответе сервера нет массива students.");
+    throw new Error("В ответе отсутствует массив students");
   }
 
   return result.students;
 }
 
-function getName(student) {
-  return student.full_name ??
-         student.name ??
-         student.student_name ??
-         "Без имени";
-}
-
-function getPoints(student) {
-  const value = student.points ??
-                student.total_points ??
-                student.score ??
-                0;
-
-  const number = Number(value);
-  return Number.isFinite(number) ? number : 0;
-}
-
-function renderBoard(students) {
-  if (students.length === 0) {
-    board.innerHTML =
-      '<div class="empty">Список учеников пока пуст.</div>';
-    return;
-  }
-
+function renderStudents(students) {
   const sorted = [...students].sort((a, b) =>
-    getName(a).localeCompare(getName(b), "ru")
+    String(a.full_name || "").localeCompare(
+      String(b.full_name || ""), "ru"
+    )
   );
 
-  // Создаём строку данных для проверки изменений.
   const snapshot = JSON.stringify(
-    sorted.map(student => ({
-      id: student.id,
-      name: getName(student),
-      points: getPoints(student)
+    sorted.map(s => ({
+      id: s.id,
+      name: s.full_name,
+      points: s.points
     }))
   );
 
-  // Не перерисовываем табло, если данные не изменились.
-  if (snapshot === lastData) return;
-  lastData = snapshot;
+  if (snapshot === previousSnapshot) return;
+  previousSnapshot = snapshot;
+
+  if (sorted.length === 0) {
+    board.style.setProperty("--rows", "1");
+    board.innerHTML =
+      '<div class="empty">Активные ученики не найдены.</div>';
+    return;
+  }
+
+  // На широком экране три колонки; число строк рассчитывается автоматически.
+  const columns = window.innerWidth <= 420 ? 1
+                : window.innerWidth <= 700 ? 2 : 3;
+  const rows = Math.ceil(sorted.length / columns);
+  board.style.setProperty("--rows", String(rows));
 
   const fragment = document.createDocumentFragment();
 
@@ -283,23 +290,27 @@ function renderBoard(students) {
     bulb.className = "bulb";
     bulb.src = BULB_IMAGE;
     bulb.alt = "";
-    bulb.loading = "lazy";
-    bulb.onerror = () => {
-      bulb.style.display = "none";
-    };
+    bulb.onerror = () => bulb.remove();
 
     const number = document.createElement("span");
-    number.className = "number";
+    number.className = "student-number";
     number.textContent = String(index + 1).padStart(2, "0");
 
     const name = document.createElement("span");
-    name.textContent = getName(student);
+    name.textContent = student.full_name || "Без имени";
 
     nameBox.append(bulb, number, name);
 
     const score = document.createElement("div");
     score.className = "score";
-    score.textContent = getPoints(student);
+
+    const points = Number(student.points);
+    score.textContent =
+      student.points !== null &&
+      student.points !== undefined &&
+      Number.isFinite(points)
+        ? String(points)
+        : "—";
 
     card.append(nameBox, score);
     fragment.append(card);
@@ -309,30 +320,29 @@ function renderBoard(students) {
 }
 
 async function updateBoard() {
-  if (isLoading) return;
-  isLoading = true;
+  if (loading) return;
+  loading = true;
 
   try {
     const students = await fetchStudents();
-    renderBoard(students);
+    console.log("Данные учеников:", students);
+    renderStudents(students);
 
-    const time = new Date().toLocaleTimeString("ru-RU");
-    setConnection(`Подключено · обновлено ${time}`);
+    setStatus("Обновлено: " +
+      new Date().toLocaleTimeString("ru-RU"));
   } catch (error) {
     console.error("Ошибка табло:", error);
-
-    setConnection(
-      `Ошибка: ${error.message}`,
-      true
-    );
-
-    // Оставляем последние успешно загруженные данные на экране.
+    setStatus("Ошибка: " + error.message, true);
   } finally {
-    isLoading = false;
+    loading = false;
   }
 }
 
-// Первая загрузка и последующее обновление каждые 2 секунды.
+window.addEventListener("resize", () => {
+  previousSnapshot = "";
+  updateBoard();
+});
+
 updateBoard();
 setInterval(updateBoard, 2000);
 </script>
